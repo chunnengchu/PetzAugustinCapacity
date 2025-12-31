@@ -1,4 +1,4 @@
-# PetzAugustin
+# PetzAugustinCapacity
 A demonstration of two approaches for computing Petz-Augustin capacity
 ## Run 
 ```
