@@ -51,7 +51,7 @@ def FGM(Wj_power, alpha, eps = 1e-9, T = 1000):
     def RenyiInformation(Wj_power, p, alpha): # 
         return (alpha/(alpha-1)) * np.log(tilde_g_alpha_R(Wj_power, p, alpha))
 
-    # [cite: 374] Initialization
+    # Initialization
     n = len(Wj_power)
     p1 = np.ones(n) / n
     pt = np.ones(n) / n
@@ -60,16 +60,13 @@ def FGM(Wj_power, alpha, eps = 1e-9, T = 1000):
     qt = np.ones(n) / n
     At = 0
     Lt = 1.0
-    acc_grad = np.zeros(n) # Accumulated gradient (For \phi_t(p))
+    acc_grad = np.zeros(n) # Accumulated gradient
     
     time_list = [0.0]
     RenyiInformations = [np.real(RenyiInformation(Wj_power, pt, alpha))]
     
     start_time = time.time()
     for t in range(1, T + 1):
-        # Step 1: v is already computed from the previous iteration [cite: 377]
-        
-        # Step 2: Line search for L_k [cite: 378, 382]
         i_t = 0
         while True:
             L_curr = (2 ** i_t) * Lt
@@ -86,15 +83,13 @@ def FGM(Wj_power, alpha, eps = 1e-9, T = 1000):
             pt_next = tau_t_next * hat_pt_next + (1 - tau_t_next) * pt
             g_pt_next = tilde_g_alpha_R(Wj_power, pt_next, alpha)
             dist_term = (L_curr / 2.0) * (np.sum(np.abs(pt_next - tilde_pt_next))**2)
-            # Note: Paper uses epsilon/2 * tau 
             if g_pt_next <= g_tilde_pt_next + np.dot(grad_next, pt_next - tilde_pt_next) + dist_term + (eps * tau_t_next / 2.0):
                 break
             i_t += 1
         At = At_next
-        Lt = L_curr / 2.0  # Optional 'restore' strategy mentioned in paper [cite: 383]
+        Lt = L_curr / 2.0 
         pt = pt_next
         at = at_next
-        # Update the estimating point v_k using the total gradient (Dual Averaging) 
         acc_grad += at * grad_next
         qt = np.multiply(p1 , np.exp(-acc_grad - np.max(-acc_grad)))
         qt /= np.sum(qt)
@@ -170,7 +165,7 @@ def plot_comparison(fgm_balanced_informations, fgm_balanced_time,
     ba_informations = np.real(ba_informations)
     
     
-    # Find the minimum (i.e., best/lowest) function value achieved by either algorithm
+    # Find the minimum (i.e., best/lowest) function value
     max_information = np.max(fgm_small_informations)
 
     # Truncate the length of fgm_small_ to match others
@@ -232,7 +227,7 @@ def plot_comparison(fgm_balanced_informations, fgm_balanced_time,
 
 
     # Plot iter v.s. error
-    # Plot Rodomanov Method
+
     # Plot fgm Balanced Method
     axs[0].plot(
         fgm_balanced_iters, 
